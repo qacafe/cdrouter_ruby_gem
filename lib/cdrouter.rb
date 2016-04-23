@@ -111,14 +111,14 @@ module CDRouter
     end
 
     def package_name_to_id(name)
-      result = get_json("/api/v1/packages/")
+      result = get_json("/api/v1/packages/?limit=none")
       package = result['data'].find { |p| p['name'] == name}
       raise "Can not find package with the name #{name}" unless package
       package['id']
     end
 
     def package_id_to_name(id)
-      result = get_json("/api/v1/packages/")
+      result = get_json("/api/v1/packages/?limit=none")
       package = result['data'].find { |p| p['id'] == id}
       raise "Can not find package with id #{id}" unless package
       package['name']
@@ -153,7 +153,7 @@ module CDRouter
     def list(arg = {})
 
       if arg.key?(:tagged_with)
-        result = @session.get_json("/api/v1/packages/?filter=tags@>{#{arg[:tagged_with]}}")
+        result = @session.get_json("/api/v1/packages/?filter=tags@>{#{arg[:tagged_with]}}&limit=none")
       elsif arg.key?(:filter)
         result = @session.get_json("/api/v1/packages/?filter=#{arg[:filter]}&limit=none")
       else
