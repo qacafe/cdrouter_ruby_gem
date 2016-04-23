@@ -35,6 +35,7 @@ module CDRouter
     attr_accessor :debug
     attr_accessor :poll_interval
     attr_reader   :packages
+    attr_reader   :configs
     attr_reader   :results
     
     def api_token=(str)
@@ -58,6 +59,7 @@ module CDRouter
 
       # managers for packages and results
       @packages = CDRouter::PackageManager.new(self)
+      @configs = CDRouter::ConfigManager.new(self)
       @results = CDRouter::ResultManager.new(self)      
 
     end
@@ -121,7 +123,21 @@ module CDRouter
       raise "Can not find package with id #{id}" unless package
       package['name']
     end
-        
+
+    def config_name_to_id(name)
+      result = get_json("/api/v1/configs/?limit=none")
+      config = result['data'].find { |c| c['name'] == name}
+      raise "Can not find config with the name #{name}" unless config
+      config['id']
+    end
+
+    def config_id_to_name(id)
+      result = get_json("/api/v1/configs/?limit=none")
+      package = result['data'].find { |c| c['id'] == id}
+      raise "Can not find config with id #{id}" unless config
+      config['name']
+    end
+    
     def debug_json(result)
       if @debug == true
         puts JSON.pretty_generate(result)
@@ -200,6 +216,22 @@ module CDRouter
     end
   end
 
+  class ConfigManager
+
+    def initialize(sess)
+      @session = sess
+    end
+
+    def get(name)
+      CDRouter::Config.new(@session, name)
+    end
+    
+    def load(config_id)
+      resp = @session.get("/api/v1/config/#{config_id}/?format=text")
+      raise "failed #{resp.status} #{resp.body}" if resp.status != 200
+      resp
+    end  
+  end
   
   class ResultManager
 
@@ -277,6 +309,23 @@ module CDRouter
 
     def launch(arg = {})
       @session.packages.launch( @package_id, arg)
+    end
+  end
+
+  class Config
+    attr_accessor :session
+    attr_accessor :name
+    attr_accessor :config_id
+
+    def initialize(sess, name)
+      @name = name
+      @session = sess
+      @config_id = @session.config_name_to_id(name)
+    end
+
+    def display
+      config = @session.configs.load(@config_id)
+      puts "#{config}"
     end
     
   end
