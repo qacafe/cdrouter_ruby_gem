@@ -58,11 +58,10 @@ module CDRouter
       # don't perform SSL cert validation
       @insecure = true
 
-      # managers for packages and results
+      # managers for packages, configs and results
       @packages = CDRouter::PackageManager.new(self)
-      @configs = CDRouter::ConfigManager.new(self)
-      @results = CDRouter::ResultManager.new(self)      
-
+      @configs  = CDRouter::ConfigManager.new(self)
+      @results  = CDRouter::ResultManager.new(self)
     end
 
     def get( url )
