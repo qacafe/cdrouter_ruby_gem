@@ -2,9 +2,10 @@ CDRouter is a Ruby gem to interact with the CDRouter Web API.
 
 ## Intro
 
-This gem requires 'Patron' which is a Ruby HTTP client library. Patron does
-build against libcurl and openssl. You will need to install development
-versions of these libraries on your system.
+This gem requires 'Patron' which is a Ruby HTTP client library. Patron
+version 0.6.1 or newer is required. Patron builds against libcurl and
+openssl. You will need to install development versions of these
+libraries on your system.
 
 https://github.com/toland/patron
 
