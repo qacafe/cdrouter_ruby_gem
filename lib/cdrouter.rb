@@ -184,7 +184,6 @@ module CDRouter
       }
       
       package_list
-
     end
 
     def launch( package_id, arg = {} )
