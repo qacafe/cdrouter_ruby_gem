@@ -537,17 +537,12 @@ module CDRouter
       puts "#{config.body}"
     end
         
-    def edit( arg = {} )
-      @name = arg.key?(:name) ? arg[:name] : @name
-      @description = arg.key?(:description) ? arg[:description] : @description
-      @contents = arg.key?(:contents) ? arg[:contents] : @contents
-      @tags = arg.key?(:tags) ? arg[:tags] : @tags
-        
+    def edit
       @session.configs.edit( @config_id,
-                             name: name,
-                             description: description,
-                             contents: contents,
-                             tags: tags)
+                             name: @name,
+                             description: @description,
+                             contents: @contents,
+                             tags: @tags)
     end
 
     def upgrade( arg = {} )
