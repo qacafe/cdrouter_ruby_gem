@@ -17,13 +17,13 @@ Download the cdrouter gem.
 
 ## Install
 
-    sudo gem install ./cdrouter-0.0.0.gem
+    sudo gem install ./cdrouter-0.0.1.gem
 
 ## Run examples
 
 Before running the examples, you will need to update the URL and API token
 settings in the example scripts. Please set the base_url to the CDRouter
-system URL. If using the CDRouter user model, you will beed to specify an
+system URL. If using the CDRouter user model, you will need to specify an
 API token of a user from ADMIN -> USERS on your CDRouter system.
 
      sess = CDRouter::Session.new

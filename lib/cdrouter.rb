@@ -24,6 +24,7 @@
 ## -------------------------------------------------------------------
 
 # -- Require Patron for HTTP client
+gem "patron", ">= 0.6.1"
 require 'patron'
 
 # -- Require for JSON handling
@@ -78,7 +79,22 @@ module CDRouter
       end
       super(url, body)
     end
-    
+
+    def patch ( url, body )
+      if @debug == true
+        puts "PATCH #{url}"
+        puts body
+      end
+      super( url, body)
+    end
+
+    def delete( url )
+      if @debug == true
+        puts "DELETE #{url}"
+      end
+      super(url)
+    end
+        
     def get_json( url )
       resp = get(url)
       raise "failed #{resp.status} #{resp.body}" if resp.status != 200
@@ -107,7 +123,6 @@ module CDRouter
       else
         raise "failed #{resp.status} #{resp.body}"
       end
-      
     end
 
     def package_name_to_id(name)
@@ -118,10 +133,8 @@ module CDRouter
     end
 
     def package_id_to_name(id)
-      result = get_json("/api/v1/packages/?limit=none")
-      package = result['data'].find { |p| p['id'] == id}
-      raise "Can not find package with id #{id}" unless package
-      package['name']
+      result = get_json("/api/v1/packages/#{id}/")
+      result['data']['name']
     end
 
     def config_name_to_id(name)
@@ -132,10 +145,8 @@ module CDRouter
     end
 
     def config_id_to_name(id)
-      result = get_json("/api/v1/configs/?limit=none")
-      package = result['data'].find { |c| c['id'] == id}
-      raise "Can not find config with id #{id}" unless config
-      config['name']
+      result = get_json("/api/v1/configs/#{id}/")
+      result['data']['name']
     end
     
     def debug_json(result)
@@ -150,6 +161,14 @@ module CDRouter
       @session = sess
     end
 
+    def get(name)
+      CDRouter::Package.new(@session, name: name)
+    end
+    
+    def get(id)
+      CDRouter::Package.new(@session, id: id)
+    end
+       
     def list(arg = {})
 
       if arg.key?(:tagged_with)
@@ -162,35 +181,27 @@ module CDRouter
          
       package_list = []
       result['data'].each { |p|          
-        package_list.push( CDRouter::Package.new(@session, p['name']) )
+        package_list.push( CDRouter::Package.new(@session, id: p['id']) )
       }
       
       package_list
 
     end
 
-
     def launch( package_id, arg = {} )
 
-      if arg.key?(:extra_cli_args)
-        extra = arg[:extra_cli_args]
-      else
-        extra = ""
-      end
-
-      if arg.key?(:tags)
-        tag_list = arg[:tags].split ","
-      else
-        tag_list = ""
-      end
-
+      extra = arg.key?(:extra_cli_args) ? arg[:extra_cli_args] : ""
+      tags = arg.key?(:tags) ? arg[:tags] : ""
+      tag_list = tags.kind_of?(Array) ? tags : tags.split(",")
+      
       # build POST body
       jb = { options: { tags: tag_list, extra_cli_args: extra }, package_id: package_id }
       
       name = @session.package_id_to_name( package_id )
       resp = @session.post("/api/v1/jobs/", jb.to_json )
       result = JSON.parse(resp.body)
-
+      @session.debug_json result
+      
       if resp.status < 400
         job_id = result['data']['id']
         puts "Started CDRouter package #{name} with job id #{job_id}"
@@ -214,6 +225,11 @@ module CDRouter
       CDRouter::Result.new(@session, result_id)
       
     end
+
+    def load(package_id)
+      result = @session.get_json("/api/v1/packages/#{package_id}/")
+    end
+    
   end
 
   class ConfigManager
@@ -223,14 +239,131 @@ module CDRouter
     end
 
     def get(name)
-      CDRouter::Config.new(@session, name)
+      CDRouter::Config.new(@session, name: name)
+    end
+
+    def get_by_id(id)
+      CDRouter::Config.new(@session, id: id)
     end
     
     def load(config_id)
-      resp = @session.get("/api/v1/config/#{config_id}/?format=text")
+      result = @session.get_json("/api/v1/configs/#{config_id}/")
+    end
+    
+    def load_text(config_id)
+      resp = @session.get("/api/v1/configs/#{config_id}/?format=text")
       raise "failed #{resp.status} #{resp.body}" if resp.status != 200
       resp
-    end  
+    end
+
+    def check(arg = {})
+      contents = arg.key?(:contents) ? arg[:contents] : ""
+      cb = { contents: contents}
+      resp = @session.post("/api/v1/configs/?process=check", cb.to_json )
+      result = JSON.parse(resp.body)
+      @session.debug_json result
+      
+      if resp.status < 400
+        result
+      else
+        raise "Received HTTP response code #{resp.status} - error: #{result['error']}"
+      end
+    end
+
+    def create(arg = {})
+      name = arg.key?(:name) ? arg[:name] : ""
+      description = arg.key?(:description) ? arg[:description] : ""
+      contents = arg.key?(:contents) ? arg[:contents] : ""
+      tags = arg.key?(:tags) ? arg[:tags] : ""
+
+      # -- handle tag array or "," list
+      tag_list = tags.kind_of?(Array) ? tags : tags.split(",")
+        
+      cb = { name: name, description: description, contents: contents, tags: tag_list}
+
+      resp = @session.post("/api/v1/configs/", cb.to_json )
+      result = JSON.parse(resp.body)
+      @session.debug_json result
+      
+      if resp.status < 400
+        CDRouter::Config.new(@session, id: result['data']['id'])
+      else
+        raise "Received HTTP response code #{resp.status} - error: #{result['error']}"
+      end             
+    end
+
+    def delete(name)
+      begin
+        config_id = @session.config_name_to_id(name)
+        resp = @session.delete("/api/v1/configs/#{config_id}/")
+        raise "failed #{resp.status} #{resp.body}" if resp.status != 204  
+      rescue
+        raise "Can not find configuration file #{name}"
+      end
+    end
+    
+    def edit(config_id, arg = {})
+      name = arg.key?(:name) ? arg[:name] : ""
+      description = arg.key?(:description) ? arg[:description] : ""
+      contents = arg.key?(:contents) ? arg[:contents] : ""
+      tags = arg.key?(:tags) ? arg[:tags] : ""
+
+      # -- handle tag array or "," list
+      tag_list = tags.kind_of?(Array) ? tags : tags.split(",")
+        
+      cb = { name: name, description: description, contents: contents, tags: tag_list}
+
+      resp = @session.patch("/api/v1/configs/#{config_id}/", cb.to_json )
+      result = JSON.parse(resp.body)
+      @session.debug_json result
+      
+      if resp.status < 400
+        puts "Modified CDRouter config with id #{config_id}"
+      else
+        puts "Received HTTP response code #{resp.status} - error: #{result['error']}"
+        raise "Could not modify CDRouter config #{config_id}"
+      end             
+    end
+
+    def exists?(name)
+      begin
+        @session.config_name_to_id(name)
+        true
+      rescue
+        false
+      end      
+    end
+    
+    def upgrade(arg = {})
+      contents = arg.key?(:contents) ? arg[:contents] : ""
+      cb = { contents: contents}
+      resp = @session.post("/api/v1/configs/?process=upgrade", cb.to_json )
+      result = JSON.parse(resp.body)
+      @session.debug_json result
+      
+      if resp.status < 400
+        result
+      else
+        raise "Received HTTP response code #{resp.status} - error: #{result['error']}"
+      end
+    end
+
+    def list(arg = {})
+      if arg.key?(:tagged_with)
+        result = @session.get_json("/api/v1/configs/?filter=tags@>{#{arg[:tagged_with]}}&limit=none")
+      elsif arg.key?(:filter)
+        result = @session.get_json("/api/v1/configs/?filter=#{arg[:filter]}&limit=none")
+      else
+        result = @session.get_json("/api/v1/configs/?limit=none")
+      end
+         
+      config_list = []
+      result['data'].each { |c|          
+        config_list.push( CDRouter::Config.new(@session, id: c['id']) )
+      }
+      
+      config_list
+    end
   end
   
   class ResultManager
@@ -240,7 +373,6 @@ module CDRouter
     end
 
     def list(arg = {})
-
       if arg.key?(:result_id)
         result = @session.get_json("/api/v1/results/#{arg[:result_id]}/")
       elsif arg.key?(:filter)
@@ -260,7 +392,6 @@ module CDRouter
       end
       
       result_list
-
     end
 
     def get(result_id)
@@ -297,16 +428,54 @@ module CDRouter
   
   class Package
     attr_accessor :session
-    attr_accessor :name
     attr_accessor :package_id
 
-    def initialize(sess, name)
-      @name = name
-      @session = sess
-      @package_id = @session.package_name_to_id(name)
+    attr_accessor :id
+    attr_accessor :name
+    attr_accessor :description
+    attr_reader   :created
+    attr_reader   :updated
+    attr_accessor :test_count
+    attr_accessor :testist
+    attr_accessor :extra_cli_args
+    attr_reader   :user_id
+    attr_reader   :config_id
+    attr_accessor :options
+    attr_accessor :tags
+    
+    def initialize(sess, arg = {})
 
+      @session = sess
+
+      if arg.key?(:name)
+        @package_id = @session.package_name_to_id(arg[:name])
+        @name = name
+      elsif arg.key?(:id)
+        @package_id = arg[:id]
+      else
+        raise "Package must specify id: or name:"
+      end
+      
+      refresh
     end
 
+    def refresh
+      p = @session.packages.load(@package_id)
+
+      @id              = p['data']['id']
+      @name            = p['data']['name']
+      @description     = p['data']['description']
+      @created         = p['data']['created']
+      @updated         = p['data']['updated']
+      @test_count      = p['data']['test_count']
+      @testlist        = p['data']['testlist']
+      @extra_cli_args  = p['data']['extra_cli_args']
+      @user_id         = p['data']['user_id']
+      @config_id       = p['data']['config_id']
+      @options         = p['data']['options']
+      @tags            = p['data']['tags']
+    end
+        
     def launch(arg = {})
       @session.packages.launch( @package_id, arg)
     end
@@ -314,20 +483,89 @@ module CDRouter
 
   class Config
     attr_accessor :session
-    attr_accessor :name
     attr_accessor :config_id
 
-    def initialize(sess, name)
-      @name = name
+    attr_accessor :id
+    attr_accessor :name
+    attr_accessor :description
+    attr_reader   :created
+    attr_reader   :updated
+    attr_accessor :contents
+    attr_reader   :user_id
+    attr_accessor :tags
+
+    attr_reader   :errors
+    
+    def initialize(sess, arg = {})
+
+      # -- remeber the session
       @session = sess
-      @config_id = @session.config_name_to_id(name)
+      
+      if arg.key?(:name)
+        @config_id = @session.config_name_to_id(arg[:name])
+      elsif arg.key?(:id)
+        @config_id = arg[:id]
+      else
+        raise "Configuration must specify id: or name:"
+      end
+      
+      refresh
+
     end
 
-    def display
+    def refresh
       config = @session.configs.load(@config_id)
-      puts "#{config}"
+
+      @id          = config['data']['id']
+      @name        = config['data']['name']
+      @description = config['data']['description']
+      @created     = config['data']['created']
+      @updated     = config['data']['updated']
+      @contents    = config['data']['contents']
+      @user_id     = config['data']['user_id']
+      @tags        = config['data']['tags']      
+    end
+
+    def check?( arg = {} )
+      config_check = arg.key?(:contents) ? arg[:contents] : @contents
+      result = @session.configs.check( contents: config_check)
+      @errors = result['data']['errors']
+
+      result['data']['errors'].empty?
     end
     
+    def display
+      config = @session.configs.load_text(@config_id)
+      puts "#{config.body}"
+    end
+        
+    def edit( arg = {} )
+      @name = arg.key?(:name) ? arg[:name] : @name
+      @description = arg.key?(:description) ? arg[:description] : @description
+      @contents = arg.key?(:contents) ? arg[:contents] : @contents
+      @tags = arg.key?(:tags) ? arg[:tags] : @tags
+        
+      @session.configs.edit( @config_id,
+                             name: name,
+                             description: description,
+                             contents: contents,
+                             tags: tags)
+    end
+
+    def upgrade( arg = {} )
+      config_data = arg.key?(:contents) ? arg[:contents] : @contents
+      result = @session.configs.upgrade( contents: config_data)
+      if result['data']['success'] == true
+        @contents = result['data']['output']
+      else
+        raise "Unable to upgrade config file #{@name}"
+      end
+    end
+
+    def save
+        # -- for save, we just call edit using current values
+        edit
+    end
   end
   
   class Result
@@ -417,8 +655,6 @@ module CDRouter
       # -- convert to junit (the jenkins format)
       to_junit
     end
-      
   end
-  
 end
 
