@@ -1,12 +1,14 @@
+require File.expand_path("../lib/cdrouter/version", __FILE__)
+
 Gem::Specification.new do |s|
   s.name        = 'cdrouter'
-  s.version     = '0.0.1'
+  s.version     = CDRouter::VERSION
   s.date        = '2016-04-23'
   s.summary     = "CDRouter Ruby API Gem"
   s.description = "A Ruby Gem for interacting with the CDRouter REST API"
   s.authors     = ["QA Cafe"]
   s.email       = 'support@qacafe.com'
-  s.files       = ["lib/cdrouter.rb"]
+  s.files       = ["lib/cdrouter.rb", "lib/cdrouter/version.rb", "lib/cdrouter/session.rb", "lib/cdrouter/package.rb", "lib/cdrouter/config.rb", "lib/cdrouter/result.rb"]
   s.homepage    = 'http://www.qacafe.com'
   s.license     = 'MIT'
 end

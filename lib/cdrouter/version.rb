@@ -23,23 +23,7 @@
 ##
 ## -------------------------------------------------------------------
 
-# -- Require Patron for HTTP client
-gem "patron", ">= 0.6.1"
-require 'patron'
-
-# -- Require for JSON handling
-require 'json'
-
-# -- additional CDRouter modules files
-require 'cdrouter/version'
-require 'cdrouter/session'
-require 'cdrouter/package'
-require 'cdrouter/config'
-require 'cdrouter/result'
-
 module CDRouter
-  def version
-    VERSION
-  end
+   VERSION = "0.0.3"
 end
 
