@@ -46,6 +46,7 @@ module CDRouter
       
       @headers['User-Agent'] = 'CDRouter API Agent/1.0'
       @timeout = 30
+      @connect_timeout = 10
       @poll_interval = 15
 
       # don't perform SSL cert validation
