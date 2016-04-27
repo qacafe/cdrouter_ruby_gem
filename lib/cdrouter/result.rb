@@ -89,32 +89,84 @@ module CDRouter
     attr_accessor :session
     attr_accessor :result_id
 
+    attr_reader   :id
+    attr_reader   :created
+    attr_reader   :updated
+    attr_reader   :result
+    attr_reader   :status
+    attr_reader   :loops
+    attr_reader   :tests
+    attr_reader   :pass
+    attr_reader   :fail
+    attr_reader   :duration
+    attr_reader   :size_on_disk
+    attr_reader   :starred
+    attr_reader   :archived
+    attr_reader   :package_name
+    attr_reader   :package_id
+    attr_reader   :config_id
+    attr_reader   :user_id
+    attr_reader   :note
+    attr_reader   :tags
+    attr_reader   :testcases
+    attr_reader   :options
+    
     def initialize( sess, id )
       @session = sess
       @result_id = id
+
+      refresh
     end
 
+    def refresh
+      r = @session.results.load(@result_id)
+
+      @id           = r['data']['id']
+      @created      = r['data']['created']
+      @updated      = r['data']['updated']
+      @result       = r['data']['result']
+      @status       = r['data']['status']
+      @loops        = r['data']['loops'].to_i
+      @tests        = r['data']['tests']
+      @pass         = r['data']['pass'].to_i
+      @fail         = r['data']['fail'].to_i
+      @duration     = r['data']['duration'].to_i
+      @size_on_disk = r['data']['size_on_disk'].to_i
+      @starred      = r['data']['starred']
+      @archived     = r['data']['archived']
+      @package_name = r['data']['package_name']
+      @config_name  = r['data']['config_name']
+      @package_id   = r['data']['package_id']
+      @config_id    = r['data']['config_id']
+      @user_id      = r['data']['user_id']
+      @note         = r['data']['note']
+      @tags         = r['data']['tags']
+      @testcases    = r['data']['testcases']
+      @options      = r['data']['options']
+      
+    end
+    
     def name
       result_id
     end
     
     def display
-      result = @session.results.load(@result_id)
+
       puts ""
       puts "Test result:"
       puts ""
-      puts "    Summary: #{result['data']['result']}"
-      puts "      Start: #{result['data']['created']}"
-      puts "   Duration: #{result['data']['duration']} seconds"
-      puts "    Package: #{result['data']['package_name']}"
-      puts "     Config: #{result['data']['config_name']}"
-      puts "       Tags: " + result['data']['tags'].join(',')
-      puts "      Tests: #{result['data']['tests']}"
-      puts "       Pass: #{result['data']['pass']}"
-      puts "       Fail: #{result['data']['fail']}"
+      puts "    Summary: #{@result}"
+      puts "      Start: #{@created}"
+      puts "   Duration: #{@duration} seconds"
+      puts "    Package: #{@package_name}"
+      puts "     Config: #{@config_name}"
+      puts "       Tags: " + @tags.join(',')
+      puts "      Tests: #{@tests}"
+      puts "       Pass: #{@pass}"
+      puts "       Fail: #{@fail}"
       puts ""
-      puts " Report URL: #{session.base_url}/results/#{result_id}"
-      puts "  Print URL: #{session.base_url}/results/#{result_id}/print/"
+      puts " Report URL: #{session.base_url}/results/#{@result_id}"
+      puts "  Print URL: #{session.base_url}/results/#{@result_id}/print/"
       puts ""
     end
 
