@@ -14,7 +14,9 @@ text = Patron::Session.new
 text.base_url        = "http://textbelt.com"
 text.timeout         = 30
 text.connect_timeout = 10
-number = "2074758454"
+
+# fill in your phone number here
+number = "2xx475xxxx"
 
 begin
   puts "Connecting to #{sess.base_url}"
