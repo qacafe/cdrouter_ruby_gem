@@ -465,7 +465,7 @@ module CDRouter
       @description     = p['data']['description']
       @created         = p['data']['created']
       @updated         = p['data']['updated']
-      @test_count      = p['data']['test_count']
+      @test_count      = p['data']['test_count'].to_i
       @testlist        = p['data']['testlist']
       @extra_cli_args  = p['data']['extra_cli_args']
       @user_id         = p['data']['user_id']

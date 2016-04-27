@@ -23,7 +23,7 @@ end
 packages = sess.packages.list
 
 # -- sort them by test_count 
-packages.sort_by!{ |x| x.test_count.to_i }.reverse!
+packages.sort_by!{ |x| x.test_count }.reverse!
 
 puts "Found #{packages.count} CDRouter packages"
 
