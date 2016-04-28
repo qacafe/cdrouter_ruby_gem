@@ -65,7 +65,11 @@ module CDRouter
     def load_seq(result_id, seq)
       result = @session.get_json("/api/v1/results/#{result_id}/tests/#{seq}/")
     end
-    
+
+    def load_all_seq(result_id)
+      result = @session.get_json("/api/v1/results/#{result_id}/tests/?limit=none")
+    end
+        
     def export(result_id)
       resp = @session.get("/api/v1/results/#{result_id}/?format=gz")
       raise "failed #{resp.status} #{resp.body}" if resp.status != 200
@@ -110,6 +114,8 @@ module CDRouter
     attr_reader   :tags
     attr_reader   :testcases
     attr_reader   :options
+
+    attr_reader   :test_results
     
     def initialize( sess, id )
       @session = sess
@@ -143,7 +149,9 @@ module CDRouter
       @tags         = r['data']['tags']
       @testcases    = r['data']['testcases']
       @options      = r['data']['options']
-      
+
+      @test_results = @session.results.load_all_seq(@result_id)
+
     end
     
     def name
@@ -151,7 +159,6 @@ module CDRouter
     end
     
     def display
-
       puts ""
       puts "Test result:"
       puts ""
@@ -191,37 +198,34 @@ module CDRouter
      
 
     def to_junit()
-      result = @session.results.load(@result_id)
-      max = result['data']['tests']
-      
       junit = ""
-      junit.concat("<testsuite name=\"CDRouter\" package=\"#{result['data']['package_name']}\" failures=\"#{result['data']['fail']}\" tests=\"#{result['data']['tests']}\">\n")
-      
-      for seq in 1..max
-        result = @session.results.load_seq( result_id, seq )
-        test  = "#{result['data']['name']}"
-        status = "#{result['data']['result']}"
-          
+      junit.concat("<testsuite name=\"CDRouter\" package=\"#{@package_name}\" failures=\"#{@fail}\" tests=\"#{@tests}\">\n")
+
+      # -- loop over all the results
+      @test_results['data'].each { |t|  
+
+        test  = "#{t['name']}"
+        status = "#{t['result']}"
+
+        # -- add a testcase tag
         junit.concat("<testcase name=\"#{test}\">\n")
         
         if status == "fail" || status == "fatal"
           junit.concat("<failure message=\"test failure\">\n")
-          junit.concat("View the full CDRouter test log #{session.base_url}/results/#{result_id}/tests/#{seq}\n")
+          junit.concat("View the full CDRouter test log #{session.base_url}/results/#{result_id}/tests/#{t['seq']}\n")
           junit.concat("</failure>\n")
         elsif status == "pending" || status == "skipped"          
           junit.concat("<skipped/>\n")
         end
 
         junit.concat("</testcase>\n")
-        
-      end
-      
+      }
       junit.concat("</testsuite>\n")
       
     end
 
     def to_jenkins
-      # -- convert to junit (the jenkins format)
+      # convert to junit (the jenkins format)
       to_junit
     end
   end
