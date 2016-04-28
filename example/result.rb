@@ -2,6 +2,7 @@
 
 # -- Use the CDRouter Gem to make life easy
 require 'cdrouter'
+require 'date'
 
 sess = CDRouter::Session.new
 sess.base_url     = "https://10.0.1.179"
@@ -49,5 +50,6 @@ result.logdir_to_tgz( "example.tgz" )
 File.write( "example.xml", result.to_jenkins )
 File.write( result.name + ".xml", result.to_jenkins )
 
-count = sess.results.list.count
-puts "Found #{count} results"
+# -- Find results over the last 8 days
+count = sess.results.list( :filter => "created>=" + (Date.today - 8 ).to_s).count
+puts "Found #{count} results from the last 8 days"

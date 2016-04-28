@@ -41,9 +41,9 @@ module CDRouter
        
     def list(arg = {})
 
-      if arg.key?(:tagged_with)
+      if arg[:tagged_with]
         result = @session.get_json("/api/v1/packages/?filter=tags@>{#{arg[:tagged_with]}}&limit=none")
-      elsif arg.key?(:filter)
+      elsif arg[:filter]
         result = @session.get_json("/api/v1/packages/?filter=#{arg[:filter]}&limit=none")
       else
         result = @session.get_json("/api/v1/packages/?limit=none")
@@ -59,8 +59,8 @@ module CDRouter
 
     def launch( package_id, arg = {} )
 
-      extra = arg.key?(:extra_cli_args) ? arg[:extra_cli_args] : ""
-      tags = arg.key?(:tags) ? arg[:tags] : ""
+      extra = arg[:extra_cli_args] || ""
+      tags = arg[:tags] || ""
       tag_list = tags.kind_of?(Array) ? tags : tags.split(",")
       
       # build POST body
@@ -122,10 +122,10 @@ module CDRouter
 
       @session = sess
 
-      if arg.key?(:name)
+      if arg[:name]
         @package_id = @session.package_name_to_id(arg[:name])
         @name = name
-      elsif arg.key?(:id)
+      elsif arg[:id]
         @package_id = arg[:id]
       else
         raise "Package must specify id: or name:"

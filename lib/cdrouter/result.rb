@@ -32,9 +32,9 @@ module CDRouter
     end
 
     def list(arg = {})
-      if arg.key?(:result_id)
+      if arg[:result_id]
         result = @session.get_json("/api/v1/results/#{arg[:result_id]}/")
-      elsif arg.key?(:filter)
+      elsif arg[:filter]
         result = @session.get_json("/api/v1/results/?filter=#{arg[:filter]}&limit=none")
       else
         result = @session.get_json("/api/v1/results/?limit=none")

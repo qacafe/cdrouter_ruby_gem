@@ -50,7 +50,7 @@ module CDRouter
     end
 
     def check(arg = {})
-      contents = arg.key?(:contents) ? arg[:contents] : ""
+      contents = arg[:contents] || ""
       cb = { contents: contents}
       resp = @session.post("/api/v1/configs/?process=check", cb.to_json )
       result = JSON.parse(resp.body)
@@ -64,10 +64,10 @@ module CDRouter
     end
 
     def create(arg = {})
-      name = arg.key?(:name) ? arg[:name] : ""
-      description = arg.key?(:description) ? arg[:description] : ""
-      contents = arg.key?(:contents) ? arg[:contents] : ""
-      tags = arg.key?(:tags) ? arg[:tags] : ""
+      name        = arg[:name] || ""
+      description = arg[:description] || ""
+      contents    = arg[:contents] || ""
+      tags        = arg[:tags] || ""
 
       # -- handle tag array or "," list
       tag_list = tags.kind_of?(Array) ? tags : tags.split(",")
@@ -96,10 +96,10 @@ module CDRouter
     end
     
     def edit(config_id, arg = {})
-      name = arg.key?(:name) ? arg[:name] : ""
-      description = arg.key?(:description) ? arg[:description] : ""
-      contents = arg.key?(:contents) ? arg[:contents] : ""
-      tags = arg.key?(:tags) ? arg[:tags] : ""
+      name        = arg[:name] || ""
+      description = arg[:description] || ""
+      contents    = arg[:contents] || ""
+      tags        = arg[:tags] || ""
 
       # -- handle tag array or "," list
       tag_list = tags.kind_of?(Array) ? tags : tags.split(",")
@@ -128,7 +128,7 @@ module CDRouter
     end
     
     def upgrade(arg = {})
-      contents = arg.key?(:contents) ? arg[:contents] : ""
+      contents = arg[:contents] || ""
       cb = { contents: contents}
       resp = @session.post("/api/v1/configs/?process=upgrade", cb.to_json )
       result = JSON.parse(resp.body)
@@ -142,9 +142,9 @@ module CDRouter
     end
 
     def list(arg = {})
-      if arg.key?(:tagged_with)
+      if arg[:tagged_with]
         result = @session.get_json("/api/v1/configs/?filter=tags@>{#{arg[:tagged_with]}}&limit=none")
-      elsif arg.key?(:filter)
+      elsif arg[:filter]
         result = @session.get_json("/api/v1/configs/?filter=#{arg[:filter]}&limit=none")
       else
         result = @session.get_json("/api/v1/configs/?limit=none")
@@ -179,9 +179,9 @@ module CDRouter
       # -- remeber the session
       @session = sess
       
-      if arg.key?(:name)
+      if arg[:name]
         @config_id = @session.config_name_to_id(arg[:name])
-      elsif arg.key?(:id)
+      elsif arg[:id]
         @config_id = arg[:id]
       else
         raise "Configuration must specify id: or name:"
@@ -205,7 +205,7 @@ module CDRouter
     end
 
     def check?( arg = {} )
-      config_check = arg.key?(:contents) ? arg[:contents] : @contents
+      config_check = arg[:contents] || @contents
       result = @session.configs.check( contents: config_check)
       @errors = result['data']['errors']
 
@@ -226,7 +226,7 @@ module CDRouter
     end
 
     def upgrade( arg = {} )
-      config_data = arg.key?(:contents) ? arg[:contents] : @contents
+      config_data = arg[:contents] || @contents
       result = @session.configs.upgrade( contents: config_data)
       if result['data']['success'] == true
         @contents = result['data']['output']
