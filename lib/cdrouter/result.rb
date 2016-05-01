@@ -34,6 +34,8 @@ module CDRouter
     def list(arg = {})
       if arg[:result_id]
         result = @session.get_json("/api/v1/results/#{arg[:result_id]}/")
+      elsif arg[:tagged_with]
+        result = @session.get_json("/api/v1/results/?filter=tags@>{#{arg[:tagged_with]}}&limit=none")
       elsif arg[:filter]
         result = @session.get_json("/api/v1/results/?filter=#{arg[:filter]}&limit=none")
       else
@@ -49,7 +51,51 @@ module CDRouter
       else
         result_list.push( CDRouter::Result.new(@session, result['data']['id']) )
       end
-      
+      result_list
+    end
+
+    def first_page(arg = {})
+      if arg[:tagged_with]
+        result = @session.get_json("/api/v1/results/?filter=tags@>{#{arg[:tagged_with]}}")
+      elsif arg[:filter]
+        result = @session.get_json("/api/v1/results/?filter=#{arg[:filter]}")
+      else
+        result = @session.get_json("/api/v1/results/")
+      end
+    end
+    
+    def pages(arg = {})
+      result = first_page(arg)
+
+      # return the last page count
+      result['links']['last']
+    end
+
+    def count(arg = {})
+      result = first_page(arg)
+
+      # return the total result count
+      result['links']['total']
+    end
+        
+    def page(num, arg = {})
+      if arg[:tagged_with]
+        result = @session.get_json("/api/v1/results/?filter=tags@>{#{arg[:tagged_with]}}&page=#{num}")
+      elsif arg[:filter]
+        result = @session.get_json("/api/v1/results/?filter=#{arg[:filter]}&page=#{num}")
+      else
+        result = @session.get_json("/api/v1/results/?page=#{num}")
+      end
+
+      result_list = []
+
+      if result['data'].kind_of?(Array)
+        result['data'].each do |r|
+           result_list.push( CDRouter::Result.new(@session, r['id']) )
+        end
+      else
+        result_list.push( CDRouter::Result.new(@session, result['data']['id']) )
+      end      
       result_list
     end
 
@@ -150,8 +196,13 @@ module CDRouter
       @testcases    = r['data']['testcases']
       @options      = r['data']['options']
 
-      @test_results = @session.results.load_all_seq(@result_id)
+      # -- too expensive to always load the full results
+      # @test_results = @session.results.load_all_seq(@result_id)
 
+    end
+
+    def get_full_results
+      @session.results.load_all_seq(@result_id)
     end
     
     def name
@@ -202,7 +253,9 @@ module CDRouter
       junit.concat("<testsuite name=\"CDRouter\" package=\"#{@package_name}\" failures=\"#{@fail}\" tests=\"#{@tests}\">\n")
 
       # -- loop over all the results
-      @test_results['data'].each { |t|  
+      test_results = get_full_results
+      
+      test_results['data'].each { |t|  
 
         test  = "#{t['name']}"
         status = "#{t['result']}"
