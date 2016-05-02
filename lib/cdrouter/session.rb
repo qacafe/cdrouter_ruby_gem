@@ -118,6 +118,12 @@ module CDRouter
       end
     end
 
+    def import_from_file(result)
+      resp = post_multipart("/api/v1/imports/", {}, { :file => result } )
+      result = JSON.parse(resp.body)
+      raise "failed #{resp.status} #{resp.body}" if resp.status != 200  
+    end
+    
     def package_name_to_id(name)
       result = get_json("/api/v1/packages/?limit=none")
       package = result['data'].find { |p| p['name'] == name}

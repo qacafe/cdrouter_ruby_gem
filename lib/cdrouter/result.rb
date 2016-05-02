@@ -32,14 +32,17 @@ module CDRouter
     end
 
     def list(arg = {})
+
+      limit = arg[:limit] || "none"
+      
       if arg[:result_id]
         result = @session.get_json("/api/v1/results/#{arg[:result_id]}/")
       elsif arg[:tagged_with]
-        result = @session.get_json("/api/v1/results/?filter=tags@>{#{arg[:tagged_with]}}&limit=none")
+        result = @session.get_json("/api/v1/results/?filter=tags@>{#{arg[:tagged_with]}}&limit=#{limit}")
       elsif arg[:filter]
-        result = @session.get_json("/api/v1/results/?filter=#{arg[:filter]}&limit=none")
+        result = @session.get_json("/api/v1/results/?filter=#{arg[:filter]}&limit=#{limit}")
       else
-        result = @session.get_json("/api/v1/results/?limit=none")
+        result = @session.get_json("/api/v1/results/?limit=#{limit}")
       end
 
       result_list = []
@@ -66,14 +69,12 @@ module CDRouter
     
     def pages(arg = {})
       result = first_page(arg)
-
       # return the last page count
       result['links']['last']
     end
 
     def count(arg = {})
       result = first_page(arg)
-
       # return the total result count
       result['links']['total']
     end
@@ -232,7 +233,8 @@ module CDRouter
       resp = @session.results.export(@result_id)
       gz = File.open( path, 'w')
       gz.write( resp.body)
-      gz.close        
+      gz.close
+      path
     end
 
     def to_csv
