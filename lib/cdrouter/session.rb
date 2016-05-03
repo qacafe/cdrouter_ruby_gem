@@ -118,8 +118,20 @@ module CDRouter
       end
     end
 
-    def import_from_file(result)
-      resp = post_multipart("/api/v1/imports/", {}, { :file => result } )
+    def import_from_file(path)
+
+      # step 1
+      resp = post_multipart("/api/v1/imports/", {}, { :file => path } )
+      result = JSON.parse(resp.body)
+      raise "failed #{resp.status} #{resp.body}" if resp.status != 200  
+      commit_id = result['data']['id']
+      
+      # step 2
+      result2 = get_json("/api/v1/imports/#{commit_id}/request/")
+      body = result2['data'].to_json
+
+      # step 3
+      resp = post("/api/v1/imports/#{commit_id}/", body)
       result = JSON.parse(resp.body)
       raise "failed #{resp.status} #{resp.body}" if resp.status != 200  
     end

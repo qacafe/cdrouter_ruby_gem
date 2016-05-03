@@ -34,18 +34,31 @@ end
 
 # -- get the last result
 puts "Looking up latest results on #{from.base_url}"
-results = from.results.list( :limit => 1)
+results = from.results.list( :limit => 2)
 
 # -- perform export/import
 results.each do |r|
 
+  if r.status == "running"
+    next
+  end
+  
   # -- export with your own filename
   puts "Exporting latest result from #{from.base_url} ..."
   path = r.export_to_file
 
   puts "Importing #{path} from #{from.base_url} to #{to.base_url}"
-  to.import_from_file( path )
+  id = to.import_from_file( path )
 
+  #puts "base is #{to.base_url}"
+  #to = CDRouter::Session.new
+  #to.base_url       = "http://10.0.1.179:8015"
+  #to.api_token      = "5a21f9c7"
+  #to.debug          = false
+
+  #to.import_commit(id)
+
+  exit
 end
 
 
