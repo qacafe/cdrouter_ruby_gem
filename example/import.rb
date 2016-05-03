@@ -48,7 +48,7 @@ results.each do |r|
   path = r.export_to_file
 
   puts "Importing #{path} from #{from.base_url} to #{to.base_url}"
-  id = to.import_from_file( path )
+  to.import_from_file( path )
 
   exit
 end
