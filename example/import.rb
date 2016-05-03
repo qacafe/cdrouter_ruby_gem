@@ -50,14 +50,6 @@ results.each do |r|
   puts "Importing #{path} from #{from.base_url} to #{to.base_url}"
   id = to.import_from_file( path )
 
-  #puts "base is #{to.base_url}"
-  #to = CDRouter::Session.new
-  #to.base_url       = "http://10.0.1.179:8015"
-  #to.api_token      = "5a21f9c7"
-  #to.debug          = false
-
-  #to.import_commit(id)
-
   exit
 end
 
