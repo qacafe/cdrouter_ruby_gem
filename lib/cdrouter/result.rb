@@ -57,6 +57,18 @@ module CDRouter
       result_list
     end
 
+    def last_finished_result
+
+      # we get the last 2 results since one result may be running
+      results = list( :limit => 2 )
+
+      # return the first non running result
+      result = results.find { |r| r.status != "running" }
+
+      raise "Can not find a last result" unless result
+      result
+    end
+    
     def first_page(arg = {})
       if arg[:tagged_with]
         result = @session.get_json("/api/v1/results/?filter=tags@>{#{arg[:tagged_with]}}")

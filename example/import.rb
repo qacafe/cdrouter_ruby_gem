@@ -34,23 +34,14 @@ end
 
 # -- get the last result
 puts "Looking up latest results on #{from.base_url}"
-results = from.results.list( :limit => 2)
-
-# -- perform export/import
-results.each do |r|
-
-  if r.status == "running"
-    next
-  end
+result = from.results.last_finished_result
   
-  # -- export with your own filename
-  puts "Exporting latest result from #{from.base_url} ..."
-  path = r.export_to_file
+# -- export with your own filename
+puts "Exporting latest result from #{from.base_url} ..."
+path = result.export_to_file
 
-  puts "Importing #{path} from #{from.base_url} to #{to.base_url}"
-  to.import_from_file( path )
+puts "Importing #{path} from #{from.base_url} to #{to.base_url}"
+to.import_from_file( path )
 
-  exit
-end
 
 
