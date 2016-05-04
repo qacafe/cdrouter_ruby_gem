@@ -128,7 +128,12 @@ module CDRouter
     def load_all_seq(result_id)
       result = @session.get_json("/api/v1/results/#{result_id}/tests/?limit=none")
     end
-        
+
+    def delete(result_id)
+        resp = @session.delete("/api/v1/results/#{result_id}/")
+        raise "failed #{resp.status} #{resp.body}" if resp.status != 204
+    end
+
     def export(result_id)
       resp = @session.get("/api/v1/results/#{result_id}/?format=gz")
       raise "failed #{resp.status} #{resp.body}" if resp.status != 200
