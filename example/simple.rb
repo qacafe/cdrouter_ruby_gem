@@ -21,7 +21,7 @@ end
 sess.packages.list( :tagged_with =>"demo").each do |p| 
 
   # -- launch this package and tag with "jenkins"
-  result = p.launch( :tags => "jenkins,blah", :extra_cli_args => "-testvar myvar=example")
+  result = p.launch( :tags => "jenkins,tr-069", :extra_cli_args => "-testvar myvar=example")
 
   # -- display a text report
   result.display
