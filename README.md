@@ -30,10 +30,50 @@ API token of a user from ADMIN -> USERS on your CDRouter system.
      sess.base_url     = "https://10.0.1.179"
      sess.api_token    = "5a21f9c7"
 
-Now you can run the examples
 
-    ./example/simple.rb
+## Another example
+
+The example below searches for all packages taged with "demo" and launches them.
+A simple text report is displayed after each package finished. See the
+jenkins.rb example for more details on how to integrate your results with
+Jenkins.
 
 
+``` text
+#!/usr/bin/ruby
+
+# -- Use the CDRouter Gem to make life easy
+require 'cdrouter'
+
+sess = CDRouter::Session.new
+sess.base_url     = "https://10.0.1.179"
+sess.api_token    = "5a21f9c7"
+sess.debug        = false
+
+
+begin
+  puts "Connecting to #{sess.base_url}"
+  puts "Found CDRouter version " + sess.version
+rescue => exception
+  puts "Unable to determine the CDRouter Web API version from #{sess.base_url}"
+  puts "Error: " + exception.message
+  exit
+end
+
+sess.packages.list( :tagged_with =>"demo").each do |p| 
+
+  # -- launch this package and tag with "jenkins"
+  result = p.launch( :tags => "jenkins,blah", :extra_cli_args => "-testvar myvar=example")
+
+  # -- display a text report
+  result.display
+
+end
+```
+
+
+Now you can explore the simple examples in the example directory
+
+./example/simple.rb
+    
 Copyright (c) 2016 QA Cafe
-
