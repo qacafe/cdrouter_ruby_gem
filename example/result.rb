@@ -51,5 +51,23 @@ File.write( "example.xml", result.to_jenkins )
 File.write( result.name + ".xml", result.to_jenkins )
 
 # -- Find results over the last 8 days
-count = sess.results.list( :filter => "created>=" + (Date.today - 8 ).to_s).count
+count = sess.results.count( :filter => "created>=" + (Date.today - 8 ).to_s)
 puts "Found #{count} results from the last 8 days"
+
+pages = sess.results.pages
+puts "Found #{pages} total pages"
+
+count = sess.results.count
+puts "Found #{count} total results"
+
+# -- tag with done
+result.tag("done")
+
+# -- star result
+result.star
+
+# archive result
+result.archive
+
+# unarchive result
+result.archive(false)

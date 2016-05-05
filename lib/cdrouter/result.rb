@@ -117,6 +117,25 @@ module CDRouter
       CDRouter::Result.new(@session, result['data']['id'])
     end
 
+    def edit(result_id, arg = {})
+      starred         = arg[:starred] || false
+      archived        = arg[:archived] || false
+      tags            = arg[:tags] || ""
+      
+      tag_list = tags.kind_of?(Array) ? tags : tags.split(",")
+      
+      cb = { starred: starred, archived: archived, tags: tag_list}
+      resp = @session.patch("/api/v1/results/#{result_id}/", cb.to_json )
+      result = JSON.parse(resp.body)
+      @session.debug_json result
+
+      if resp.status != 200
+        puts "Received HTTP response code #{resp.status} - error: #{result['error']}"
+        raise "Could not modify CDRouter config #{result_id}"
+      end     
+
+    end
+    
     def load(result_id)
       result = @session.get_json("/api/v1/results/#{result_id}/")
     end
@@ -246,6 +265,32 @@ module CDRouter
       puts ""
     end
 
+    def tag( new_tags )
+      refresh
+      tag_list = new_tags.kind_of?(Array) ? new_tags : new_tags.split(",")
+      @session.results.edit( @result_id,
+                             :tags => @tags + tag_list,
+                             :starred => @starred,
+                             :archived => @archived)
+    end
+
+    def star( value = true )
+      refresh
+      @session.results.edit( @result_id,
+                             :tags => @tags,
+                             :starred => value,
+                             :archived => @archived)
+    end
+
+    def archive( value = true )
+      refresh
+      @session.results.edit( @result_id,
+                             :tags => @tags,
+                             :starred => @starred,
+                             :archived => value)
+    end
+
+    
     def export_to_file( path = @result_id + ".gz" )
       resp = @session.results.export(@result_id)
       gz = File.open( path, 'w')
