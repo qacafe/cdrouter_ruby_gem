@@ -1,4 +1,5 @@
-CDRouter is a Ruby gem to interact with the CDRouter Web API. 
+CDRouter is a Ruby gem to interact with the CDRouter Web API. For more
+information on CDRouter please visit http://www.qacafe.com.
 
 ## Intro
 
@@ -75,5 +76,11 @@ end
 Now you can explore the simple examples in the example directory
 
 ./example/simple.rb
-    
+
+
+## More resources
+
+http://www.qacafe.com
+http://support.qacafe.com/cdrouter-web-api/
+
 Copyright (c) 2016 QA Cafe
