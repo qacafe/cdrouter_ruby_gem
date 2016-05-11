@@ -36,6 +36,8 @@ require 'cdrouter/session'
 require 'cdrouter/package'
 require 'cdrouter/config'
 require 'cdrouter/result'
+require 'cdrouter/history'
+require 'cdrouter/user'
 
 module CDRouter
   def version

@@ -251,6 +251,7 @@ module CDRouter
       fmt += "Test result:\n"
       fmt += "\n"
       fmt += "   Summary: #{@result}\n"
+      fmt += "   User: " + @session.users.get(@user_id).name + "\n"
       fmt += "   Start: #{@created}\n"
       fmt += "   Duration: #{@duration} seconds\n"
       fmt += "   Package: #{@package_name}\n"
