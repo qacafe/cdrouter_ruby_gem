@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = "A Ruby Gem for interacting with the CDRouter REST API"
   s.authors     = ["QA Cafe"]
   s.email       = 'support@qacafe.com'
-  s.files       = ["lib/cdrouter.rb", "lib/cdrouter/version.rb", "lib/cdrouter/session.rb", "lib/cdrouter/package.rb", "lib/cdrouter/config.rb", "lib/cdrouter/result.rb"]
+  s.files       = ["lib/cdrouter.rb", "lib/cdrouter/version.rb", "lib/cdrouter/session.rb", "lib/cdrouter/package.rb", "lib/cdrouter/config.rb", "lib/cdrouter/result.rb", "lib/cdrouter/history.rb"]
   s.homepage    = 'http://www.qacafe.com'
   s.license     = 'MIT'
 end

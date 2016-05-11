@@ -18,7 +18,7 @@ Download the cdrouter gem.
 
 ## Install
 
-    sudo gem install ./cdrouter-0.0.4.gem
+    sudo gem install ./cdrouter-0.0.5.gem
 
 ## Run examples
 

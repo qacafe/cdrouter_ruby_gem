@@ -31,6 +31,7 @@ module CDRouter
     attr_reader   :packages
     attr_reader   :configs
     attr_reader   :results
+    attr_reader   :history
     
     def api_token=(str)
       @api_token = str
@@ -56,6 +57,7 @@ module CDRouter
       @packages = CDRouter::PackageManager.new(self)
       @configs  = CDRouter::ConfigManager.new(self)
       @results  = CDRouter::ResultManager.new(self)
+      @history  = CDRouter::HistoryManager.new(self)
     end
 
     def get( url )
