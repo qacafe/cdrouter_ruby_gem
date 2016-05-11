@@ -245,24 +245,29 @@ module CDRouter
     def name
       result_id
     end
+
+    def text_summary
+      fmt = "\n"
+      fmt += "Test result:\n"
+      fmt += "\n"
+      fmt += "   Summary: #{@result}\n"
+      fmt += "   Start: #{@created}\n"
+      fmt += "   Duration: #{@duration} seconds\n"
+      fmt += "   Package: #{@package_name}\n"
+      fmt += "   Config: #{@config_name}\n"
+      fmt += "   Tags: " + @tags.join(',') + "\n"
+      fmt += "   Tests: #{@tests}\n"
+      fmt += "   Pass: #{@pass}\n"
+      fmt += "   Fail: #{@fail}\n"
+      fmt += "\n"
+      fmt += "   Report URL: #{session.base_url}/results/#{@result_id}\n"
+      fmt += "   Print URL: #{session.base_url}/results/#{@result_id}/print/\n"
+      fmt += "\n"
+      fmt
+    end
     
     def display
-      puts ""
-      puts "Test result:"
-      puts ""
-      puts "    Summary: #{@result}"
-      puts "      Start: #{@created}"
-      puts "   Duration: #{@duration} seconds"
-      puts "    Package: #{@package_name}"
-      puts "     Config: #{@config_name}"
-      puts "       Tags: " + @tags.join(',')
-      puts "      Tests: #{@tests}"
-      puts "       Pass: #{@pass}"
-      puts "       Fail: #{@fail}"
-      puts ""
-      puts " Report URL: #{session.base_url}/results/#{@result_id}"
-      puts "  Print URL: #{session.base_url}/results/#{@result_id}/print/"
-      puts ""
+      puts text_summary
     end
 
     def tag( new_tags )
