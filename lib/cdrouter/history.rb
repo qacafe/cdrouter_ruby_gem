@@ -33,7 +33,7 @@ module CDRouter
 
     def list(arg = {})
 
-      limit = arg[:limit] || "none"
+      limit = arg[:limit] || "100"
       
       if arg[:filter]
         result = @session.get_json("/api/v1/history/?filter=#{arg[:filter]}&limit=#{limit}")
