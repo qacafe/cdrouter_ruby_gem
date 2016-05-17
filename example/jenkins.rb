@@ -3,6 +3,11 @@
 # -- Use the CDRouter Gem to make life easy
 require 'cdrouter'
 
+# -- Since we may be called from Jenkins, make sure we flush output
+# so you can monitor the script output from the Jenkins console
+STDOUT.sync = true
+
+# -- create a new CDRouter session
 sess = CDRouter::Session.new
 sess.base_url     = "https://10.0.1.179"
 sess.api_token    = "5a21f9c7"
@@ -21,7 +26,7 @@ end
 sess.packages.list( :tagged_with =>"demo").each do |p| 
 
   # -- launch this package and tag with "jenkins"
-  result = p.launch( :tags => "jenkins,blah", :extra_cli_args => "-testvar myvar=example")
+  result = p.launch( :tags => "jenkins", :extra_cli_args => "-testvar myvar=example")
 
   # -- display a text report
   result.display
