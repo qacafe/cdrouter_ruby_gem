@@ -239,6 +239,14 @@ module CDRouter
         # -- for save, we just call edit using current values
         edit
     end
+
+    def save_to_file ( path = @name )
+      config = @session.configs.load_text(@config_id)
+      c = File.open( path, 'w')
+      c.write(config.body)
+      c.close
+      path
+    end
   end
 end
 
