@@ -33,6 +33,7 @@ module CDRouter
     attr_reader   :results
     attr_reader   :history
     attr_reader   :users
+    attr_reader   :devices
     
     def api_token=(str)
       @api_token = str
@@ -60,6 +61,7 @@ module CDRouter
       @results  = CDRouter::ResultManager.new(self)
       @history  = CDRouter::HistoryManager.new(self)
       @users    = CDRouter::UserManager.new(self)
+      @devices  = CDRouter::DeviceManager.new(self)
     end
 
     def get( url )
@@ -149,6 +151,18 @@ module CDRouter
 
     def package_id_to_name(id)
       result = get_json("/api/v1/packages/#{id}/")
+      result['data']['name']
+    end
+
+    def device_name_to_id(name)
+      result = get_json("/api/v1/devices/?limit=none")
+      device = result['data'].find { |d| d['name'] == name}
+      raise "Can not find device with the name #{name}" unless device
+      device['id']
+    end
+
+    def device_id_to_name(id)
+      result = get_json("/api/v1/devices/#{id}/")
       result['data']['name']
     end
 

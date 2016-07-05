@@ -190,7 +190,9 @@ module CDRouter
     attr_reader   :starred
     attr_reader   :archived
     attr_reader   :package_name
+    attr_reader   :device_name
     attr_reader   :package_id
+    attr_reader   :device_id
     attr_reader   :config_id
     attr_reader   :user_id
     attr_reader   :note
@@ -224,8 +226,10 @@ module CDRouter
       @starred      = r['data']['starred']
       @archived     = r['data']['archived']
       @package_name = r['data']['package_name']
+      @device_name  = r['data']['device_name']
       @config_name  = r['data']['config_name']
       @package_id   = r['data']['package_id']
+      @device_id    = r['data']['device_id']
       @config_id    = r['data']['config_id']
       @user_id      = r['data']['user_id']
       @note         = r['data']['note']
@@ -256,6 +260,7 @@ module CDRouter
       fmt += "   Duration: #{@duration} seconds\n"
       fmt += "   Package: #{@package_name}\n"
       fmt += "   Config: #{@config_name}\n"
+      fmt += "   Device: #{@device_name}\n"
       fmt += "   Tags: " + @tags.join(',') + "\n"
       fmt += "   Tests: #{@tests}\n"
       fmt += "   Pass: #{@pass}\n"
