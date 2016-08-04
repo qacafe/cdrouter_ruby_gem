@@ -68,7 +68,7 @@ module CDRouter
       if @debug == true
         puts "GET #{url}"
       end
-      super(url)
+      super(URI.encode(url))
     end
 
     def post( url , body )
@@ -76,7 +76,7 @@ module CDRouter
         puts "POST #{url}"
         puts body
       end
-      super(url, body)
+      super(URI.encode(url), body)
     end
 
     def patch ( url, body )
@@ -84,14 +84,14 @@ module CDRouter
         puts "PATCH #{url}"
         puts body
       end
-      super( url, body)
+      super( URI.encode(url), body)
     end
 
     def delete( url )
       if @debug == true
         puts "DELETE #{url}"
       end
-      super(url)
+      super(URI.encode(url))
     end
         
     def get_json( url )

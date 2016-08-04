@@ -3,7 +3,7 @@ require File.expand_path("../lib/cdrouter/version", __FILE__)
 Gem::Specification.new do |s|
   s.name        = 'cdrouter'
   s.version     = CDRouter::VERSION
-  s.date        = '2016-07-05'
+  s.date        = '2016-08-04'
   s.summary     = "CDRouter Ruby API Gem"
   s.description = "A Ruby Gem for interacting with the CDRouter REST API"
   s.authors     = ["QA Cafe"]
