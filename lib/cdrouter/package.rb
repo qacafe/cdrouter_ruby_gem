@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------
 ##
 ## CDRouter Ruby Gem
-## Copyright (c) 2016 QA Cafe http://www.qacafe.com/
+## Copyright (c) 2016-2017 QA Cafe http://www.qacafe.com/
 ##
 ## Permission is hereby granted, free of charge, to any person obtaining a copy
 ## of this software and associated documentation files (the "Software"), to deal
@@ -117,6 +117,7 @@ module CDRouter
     attr_reader   :config_id
     attr_accessor :options
     attr_accessor :tags
+    attr_accessor :use_as_testlist
     
     def initialize(sess, arg = {})
 
@@ -149,6 +150,9 @@ module CDRouter
       @config_id       = p['data']['config_id']
       @options         = p['data']['options']
       @tags            = p['data']['tags']
+
+      # added in CDRouter 10.2, default to false if missing
+      @use_as_testlist = p['data']['use_as_testlist'] || "false"
     end
         
     def launch(arg = {})

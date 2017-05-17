@@ -18,7 +18,7 @@ Download the cdrouter gem.
 
 ## Install
 
-    sudo gem install ./cdrouter-0.0.7.gem
+    sudo gem install ./cdrouter-0.0.8.gem
 
 ## Run examples
 
@@ -84,4 +84,4 @@ http://www.qacafe.com
 
 http://support.qacafe.com/cdrouter-web-api/
 
-Copyright (c) 2016 QA Cafe
+Copyright (c) 2016-2017 QA Cafe
