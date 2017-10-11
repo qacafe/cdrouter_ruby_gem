@@ -19,7 +19,7 @@ rescue => exception
   exit
 end
 
-puts "Find all packages atgged with demo"
+puts "Find all packages tagged with demo"
 sess.packages.list(:tagged_with => "demo").each do |p|
   puts "Found package " + p.name
 end
