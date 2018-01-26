@@ -18,7 +18,7 @@ Download the cdrouter gem.
 
 ## Install
 
-    sudo gem install ./cdrouter-0.0.8.gem
+    sudo gem install ./cdrouter-0.0.9.gem
 
 ## Run examples
 
@@ -31,7 +31,16 @@ API token of a user from ADMIN -> USERS on your CDRouter system.
      sess.base_url     = "https://10.0.1.179"
      sess.api_token    = "5a21f9c7"
 
+## Connecting with username and password
 
+Alternatively, you may connect to the API using the username and password
+of the CDRouter system. The library will authenticate and automatically
+set the API token for future calls.
+
+     sess = CDRouter::Session.new
+     sess.base_url     = "https://10.0.1.179"
+     sess.authenticate('admin','cdrouter')
+     
 ## Another example
 
 The example below searches for all packages taged with "demo" and launches them.
@@ -48,8 +57,8 @@ require 'cdrouter'
 
 sess = CDRouter::Session.new
 sess.base_url     = "https://10.0.1.179"
-sess.api_token    = "5a21f9c7"
 sess.debug        = false
+sess.authenticate('admin','cdrouter')
 
 
 begin
@@ -84,4 +93,4 @@ http://www.qacafe.com
 
 http://support.qacafe.com/cdrouter-web-api/
 
-Copyright (c) 2016-2017 QA Cafe
+Copyright (c) 2016-2018 QA Cafe

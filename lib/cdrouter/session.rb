@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------
 ##
 ## CDRouter Ruby Gem
-## Copyright (c) 2016 QA Cafe http://www.qacafe.com/
+## Copyright (c) 2016-2018 QA Cafe http://www.qacafe.com/
 ##
 ## Permission is hereby granted, free of charge, to any person obtaining a copy
 ## of this software and associated documentation files (the "Software"), to deal
@@ -64,6 +64,24 @@ module CDRouter
       @devices  = CDRouter::DeviceManager.new(self)
     end
 
+    def authenticate( username, password)
+      body="username=#{username}&password=#{password}"
+      resp = post("/authenticate", body)
+
+      raise "failed #{resp.status} #{resp.body}" if resp.status != 200
+
+      answer = JSON.parse(resp.body)
+      debug_json answer
+      
+      if answer['data']['token']
+        # -- set the API token
+        self.api_token = answer['data']['token']
+      else
+        raise "Could not auethticate user #{username}"
+      end
+
+    end
+    
     def get( url )
       if @debug == true
         puts "GET #{url}"

@@ -5,9 +5,8 @@ require 'cdrouter'
 
 sess = CDRouter::Session.new
 sess.base_url     = "https://10.0.1.179"
-sess.api_token    = "5a21f9c7"
+sess.authenticate('admin','cdrouter')
 sess.debug        = false
-
 
 begin
   puts "Connecting to #{sess.base_url}"
