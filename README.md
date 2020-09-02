@@ -1,3 +1,5 @@
+**NOTE:** The CDRouter Ruby gem is _deprecated_ and is no longer supported.  Please use the [cdrouter.py](https://github.com/qacafe/cdrouter.py) Python library instead.
+
 CDRouter is a Ruby gem to interact with the CDRouter Web API. For more
 information on CDRouter please visit http://www.qacafe.com.
 
